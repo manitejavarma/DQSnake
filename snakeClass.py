@@ -9,7 +9,7 @@ import numpy as np
 
 # Set options to activate or deactivate the game view, and its speed
 display_option = True
-speed = 50
+speed = 1
 pygame.font.init()
 
 
@@ -20,7 +20,7 @@ class Game:
         self.game_width = game_width
         self.game_height = game_height
         self.gameDisplay = pygame.display.set_mode((game_width, game_height+60))
-        #self.bg = pygame.image.load("img/background.png")
+        self.bg = pygame.image.load("img/background.png")
         self.crash = False
         self.player = Player(self)
         self.food = Food()
@@ -54,19 +54,18 @@ class Player(object):
         move_array = [self.x_change, self.y_change]
 
         if self.eaten:
-
             self.position.append([self.x, self.y])
             self.eaten = False
             self.food = self.food + 1
         if np.array_equal(move ,[1, 0, 0]):
             move_array = self.x_change, self.y_change
-        elif np.array_equal(move,[0, 1, 0]) and self.y_change == 0:  # right - going horizontal
+        elif np.array_equal(move,[0, 1, 0]) and self.y_change == 0:  # left - going horizontal
             move_array = [0, self.x_change]
-        elif np.array_equal(move,[0, 1, 0]) and self.x_change == 0:  # right - going vertical
+        elif np.array_equal(move,[0, 1, 0]) and self.x_change == 0:  # left - going vertical
             move_array = [-self.y_change, 0]
-        elif np.array_equal(move, [0, 0, 1]) and self.y_change == 0:  # left - going horizontal
+        elif np.array_equal(move, [0, 0, 1]) and self.y_change == 0:  # right - going horizontal
             move_array = [0, -self.x_change]
-        elif np.array_equal(move,[0, 0, 1]) and self.x_change == 0:  # left - going vertical
+        elif np.array_equal(move,[0, 0, 1]) and self.x_change == 0:  # right - going vertical
             move_array = [self.y_change, 0]
         self.x_change, self.y_change = move_array
         self.x = x + self.x_change
@@ -89,7 +88,7 @@ class Player(object):
 
             update_screen()
         else:
-            pygame.time.wait(300)
+            pygame.time.wait(speed)
 
 
 class Food(object):
@@ -176,11 +175,13 @@ def run():
     score_plot = []
     counter_plot =[]
     record = 0
-    while counter_games < 150:
+    while counter_games < 550:
         # Initialize classes
         game = Game(440, 440)
         player1 = game.player
         food1 = game.food
+        
+        
 
         # Perform first move
         initialize_game(player1, game, food1, agent)
@@ -224,6 +225,7 @@ def run():
         print('Game', counter_games, '      Score:', game.score)
         score_plot.append(game.score)
         counter_plot.append(counter_games)
+        pygame.event.wait()
     agent.model.save_weights('weights.hdf5')
     plot_seaborn(counter_plot, score_plot)
 
